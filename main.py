@@ -11,7 +11,9 @@ from PIL import Image
 app = FastAPI()
 security = HTTPBearer()
 
-API_TOKEN = os.environ["API_TOKEN"]
+API_TOKEN = os.environ.get("API_TOKEN")
+if not API_TOKEN:
+    raise RuntimeError("API_TOKEN environment variable is not set")
 MODEL_T2I = os.environ.get("MODEL_T2I", "models/qwen-image")
 MODEL_EDIT = os.environ.get("MODEL_EDIT", "models/qwen-image-edit")
 
@@ -78,18 +80,21 @@ async def generate(
     cfg_scale: float = Form(4.0),
     _=Depends(verify_token),
 ):
-    load_t2i()
-    image = pipe_t2i(
-        prompt=prompt,
-        width=width,
-        height=height,
-        num_inference_steps=steps,
-        true_cfg_scale=cfg_scale,
-    ).images[0]
-    buf = io.BytesIO()
-    image.save(buf, format="PNG")
-    buf.seek(0)
-    return StreamingResponse(buf, media_type="image/png")
+    try:
+        load_t2i()
+        image = pipe_t2i(
+            prompt=prompt,
+            width=width,
+            height=height,
+            num_inference_steps=steps,
+            true_cfg_scale=cfg_scale,
+        ).images[0]
+        buf = io.BytesIO()
+        image.save(buf, format="PNG")
+        buf.seek(0)
+        return StreamingResponse(buf, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/edit")
@@ -99,14 +104,17 @@ async def edit(
     steps: int = Form(50),
     _=Depends(verify_token),
 ):
-    load_edit()
-    ref = Image.open(io.BytesIO(await image.read())).convert("RGB")
-    result = pipe_edit(
-        prompt=prompt,
-        image=ref,
-        num_inference_steps=steps,
-    ).images[0]
-    buf = io.BytesIO()
-    result.save(buf, format="PNG")
-    buf.seek(0)
-    return StreamingResponse(buf, media_type="image/png")
+    try:
+        load_edit()
+        ref = Image.open(io.BytesIO(await image.read())).convert("RGB")
+        result = pipe_edit(
+            prompt=prompt,
+            image=ref,
+            num_inference_steps=steps,
+        ).images[0]
+        buf = io.BytesIO()
+        result.save(buf, format="PNG")
+        buf.seek(0)
+        return StreamingResponse(buf, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
