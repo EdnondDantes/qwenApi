@@ -1,0 +1,12 @@
+torch==2.4.1
+torchvision==0.19.1
+diffusers>=0.31.0
+transformers>=4.46.0
+accelerate>=1.0.0
+sentencepiece
+protobuf
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart
+pillow>=10.0.0
+python-jose[cryptography]

@@ -1,0 +1,15 @@
+[Unit]
+Description=Qwen Image API
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/videoapp
+EnvironmentFile=/root/videoapp/.env
+ExecStart=/root/videoapp/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
