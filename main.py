@@ -14,7 +14,8 @@ security = HTTPBearer()
 API_TOKEN = os.environ.get("API_TOKEN")
 if not API_TOKEN:
     raise RuntimeError("API_TOKEN environment variable is not set")
-MODEL_T2I = os.environ.get("MODEL_T2I", "models/qwen-image")
+MODEL_T2I = os.environ.get("MODEL_T2I", "models/qwen-image-int8")
+MODEL_BASE = os.environ.get("MODEL_BASE", "models/qwen-image-base")
 MODEL_EDIT = os.environ.get("MODEL_EDIT", "models/qwen-image-edit")
 
 pipe_t2i = None
@@ -51,7 +52,7 @@ def load_t2i():
         MODEL_T2I, torch_dtype=torch.bfloat16, use_safetensors=False
     )
     pipe_t2i = DiffusionPipeline.from_pretrained(
-        "Qwen/Qwen-Image", transformer=transformer, torch_dtype=torch.bfloat16
+        MODEL_BASE, transformer=transformer, torch_dtype=torch.bfloat16
     )
     pipe_t2i.enable_model_cpu_offload()
     pipe_t2i.enable_vae_tiling()
