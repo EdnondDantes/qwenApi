@@ -50,6 +50,7 @@ def load_t2i():
     pipe_t2i = DiffusionPipeline.from_pretrained(
         MODEL_T2I, torch_dtype=torch.bfloat16
     ).to("cuda")
+    pipe_t2i.enable_attention_slicing()
 
 
 def load_edit():
@@ -64,6 +65,7 @@ def load_edit():
     pipe_edit = DiffusionPipeline.from_pretrained(
         MODEL_EDIT, torch_dtype=torch.bfloat16
     ).to("cuda")
+    pipe_edit.enable_attention_slicing()
 
 
 @app.get("/health")
@@ -74,8 +76,8 @@ async def health():
 @app.post("/generate")
 async def generate(
     prompt: str = Form(...),
-    width: int = Form(1024),
-    height: int = Form(1024),
+    width: int = Form(768),
+    height: int = Form(768),
     steps: int = Form(50),
     cfg_scale: float = Form(4.0),
     _=Depends(verify_token),
