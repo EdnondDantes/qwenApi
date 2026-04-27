@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd /root/videoapp
+cd "$(dirname "$0")"
 
 echo "=== 1. System deps ==="
 apt update && apt install -y python3-pip python3-venv git git-lfs nginx certbot python3-certbot-nginx
