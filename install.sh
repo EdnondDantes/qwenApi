@@ -15,9 +15,9 @@ pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorc
 pip install -r requirements.txt
 
 echo "=== 3. Download models ==="
-pip install -U "huggingface_hub[cli]"
+pip install -U "huggingface_hub[cli]" torchao
 mkdir -p models
-hf download Qwen/Qwen-Image --local-dir models/qwen-image
+hf download dimitribarbot/Qwen-Image-int8wo --local-dir models/qwen-image-int8
 hf download Qwen/Qwen-Image-Edit-2511 --local-dir models/qwen-image-edit
 
 echo "=== 4. Nginx ==="
