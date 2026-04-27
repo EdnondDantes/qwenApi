@@ -5,7 +5,8 @@ import torch
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse
-from diffusers import AutoModel, DiffusionPipeline
+from diffusers import DiffusionPipeline
+from transformers import BitsAndBytesConfig
 from PIL import Image
 
 app = FastAPI()
@@ -48,13 +49,11 @@ def load_t2i():
         pipe_edit = None
         gc.collect()
         torch.cuda.empty_cache()
-    transformer = AutoModel.from_pretrained(
-        MODEL_T2I, torch_dtype=torch.bfloat16
-    )
     pipe_t2i = DiffusionPipeline.from_pretrained(
-        MODEL_BASE, transformer=transformer, torch_dtype=torch.bfloat16
+        MODEL_BASE,
+        torch_dtype=torch.bfloat16,
+        load_in_8bit=True,
     )
-    pipe_t2i.enable_model_cpu_offload()
     pipe_t2i.enable_vae_tiling()
 
 
