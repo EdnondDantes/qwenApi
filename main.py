@@ -49,7 +49,7 @@ def load_t2i():
         gc.collect()
         torch.cuda.empty_cache()
     transformer = AutoModel.from_pretrained(
-        MODEL_T2I, torch_dtype=torch.bfloat16, use_safetensors=False
+        MODEL_T2I, torch_dtype=torch.bfloat16
     )
     pipe_t2i = DiffusionPipeline.from_pretrained(
         MODEL_BASE, transformer=transformer, torch_dtype=torch.bfloat16
