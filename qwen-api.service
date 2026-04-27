@@ -7,7 +7,7 @@ Type=simple
 User=root
 WorkingDirectory=/root/videoapp/qwenApi
 EnvironmentFile=/root/videoapp/qwenApi/.env
-ExecStart=/root/videoapp/qwenApi/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8080 --workers 1
+ExecStart=/root/videoapp/qwenApi/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8088 --workers 1
 Restart=on-failure
 RestartSec=5
 

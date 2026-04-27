@@ -10,4 +10,4 @@ set -a && source .env && set +a
 
 source venv/bin/activate
 
-uvicorn main:app --host 127.0.0.1 --port 8080 --workers 1
+uvicorn main:app --host 127.0.0.1 --port 8088 --workers 1
