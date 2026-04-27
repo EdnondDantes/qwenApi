@@ -76,8 +76,8 @@ async def health():
 @app.post("/generate")
 async def generate(
     prompt: str = Form(...),
-    width: int = Form(768),
-    height: int = Form(768),
+    width: int = Form(512),
+    height: int = Form(512),
     steps: int = Form(50),
     cfg_scale: float = Form(4.0),
     _=Depends(verify_token),
