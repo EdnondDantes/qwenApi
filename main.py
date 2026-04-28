@@ -1,65 +1,66 @@
 import io
 import os
-import gc
+from contextlib import asynccontextmanager
+
 import torch
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-from diffusers import FluxPipeline
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from PIL import Image
 
-app = FastAPI()
-security = HTTPBearer()
+load_dotenv()
 
-API_TOKEN = os.environ.get("API_TOKEN")
-if not API_TOKEN:
-    raise RuntimeError("API_TOKEN environment variable is not set")
+API_TOKEN = os.getenv("API_TOKEN", "")
+MODEL_PATH = os.getenv("MODEL_PATH", "models/qwen-image-edit")
 
-MODEL_T2I = os.environ.get("MODEL_T2I", "models/flux-schnell")
-
-pipe_t2i = None
+pipe = None
+auth_scheme = HTTPBearer()
 
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    if credentials.credentials != API_TOKEN:
-        raise HTTPException(status_code=401, detail="Invalid token")
+def check_token(creds: HTTPAuthorizationCredentials = Depends(auth_scheme)):
+    if not API_TOKEN or creds.credentials != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-def load_t2i():
-    global pipe_t2i
-    if pipe_t2i is not None:
-        return
-    pipe_t2i = FluxPipeline.from_pretrained(
-        MODEL_T2I, torch_dtype=torch.bfloat16
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global pipe
+    from diffusers import QwenImageEditPlusPipeline
+
+    pipe = QwenImageEditPlusPipeline.from_pretrained(
+        MODEL_PATH,
+        torch_dtype=torch.bfloat16,
     ).to("cuda")
+    yield
+    del pipe
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/health")
-async def health():
+def health():
     return {"status": "ok"}
 
 
-@app.post("/generate")
-async def generate(
+@app.post("/edit")
+async def edit(
+    image: UploadFile = File(...),
     prompt: str = Form(...),
-    width: int = Form(1024),
-    height: int = Form(1024),
-    steps: int = Form(4),
-    guidance_scale: float = Form(0.0),
-    _=Depends(verify_token),
+    num_inference_steps: int = Form(50),
+    _: None = Depends(check_token),
 ):
-    try:
-        load_t2i()
-        image = pipe_t2i(
-            prompt=prompt,
-            width=width,
-            height=height,
-            num_inference_steps=steps,
-            guidance_scale=guidance_scale,
-        ).images[0]
-        buf = io.BytesIO()
-        image.save(buf, format="PNG")
-        buf.seek(0)
-        return StreamingResponse(buf, media_type="image/png")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    raw = await image.read()
+    src = Image.open(io.BytesIO(raw)).convert("RGB")
+
+    result = pipe(
+        image=src,
+        prompt=prompt,
+        num_inference_steps=num_inference_steps,
+    ).images[0]
+
+    buf = io.BytesIO()
+    result.save(buf, format="PNG")
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="image/png")

@@ -1,1 +1,11 @@
-curl -X POST https://qwen.rossiinfrastructure.ru/generate -H "Authorization: Bearer a3f8c2d1e4b5a6f7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1" -F "prompt=a cat in space, 4K" -o result.png
+#!/bin/bash
+set -e
+source .env
+
+curl -X POST https://qwen.rossiinfrastructure.ru/edit \
+  -H "Authorization: Bearer $API_TOKEN" \
+  -F "image=@test_input.png" \
+  -F "prompt=make the background a sunset" \
+  -o result.png
+
+echo "Saved to result.png"

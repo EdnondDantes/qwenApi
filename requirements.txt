@@ -1,12 +1,14 @@
-torch==2.4.1
-torchvision==0.19.1
-diffusers>=0.31.0
-transformers>=4.46.0
-accelerate>=1.0.0
-sentencepiece
-protobuf
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.5.1+cu124
+torchvision==0.20.1+cu124
+
+diffusers==0.37.1
+transformers>=4.51.3
+accelerate>=0.31.0
+huggingface-hub>=0.34.0
+
 fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-python-multipart
-pillow>=10.0.0
-python-jose[cryptography]
+uvicorn>=0.30.0
+Pillow>=10.0.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.0

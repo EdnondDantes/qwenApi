@@ -1,13 +1,4 @@
 #!/bin/bash
 set -e
-
-if [ ! -f .env ]; then
-    echo "ERROR: .env file not found. Copy .env.example and fill in values."
-    exit 1
-fi
-
-set -a && source .env && set +a
-
 source venv/bin/activate
-
 uvicorn main:app --host 127.0.0.1 --port 8088 --workers 1
