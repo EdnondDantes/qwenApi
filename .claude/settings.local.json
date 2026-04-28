@@ -10,7 +10,9 @@
       "WebFetch(domain:nunchaku.tech)",
       "WebFetch(domain:pypi.org)",
       "WebFetch(domain:collabnix.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Cute_dog.jpg/640px-Cute_dog.jpg\" -OutFile \"D:\\\\Web\\\\qwenApi\\\\test\\\\test_input.jpg\")",
+      "PowerShell(Invoke-WebRequest -Uri \"https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Cute_dog.jpg/320px-Cute_dog.jpg\" -OutFile \"D:\\\\Web\\\\qwenApi\\\\test\\\\test_input.jpg\" -UserAgent \"Mozilla/5.0\")"
     ]
   }
 }

@@ -31,8 +31,8 @@ async def lifespan(app: FastAPI):
     pipe = QwenImageEditPlusPipeline.from_pretrained(
         MODEL_PATH,
         torch_dtype=torch.bfloat16,
-        device_map="balanced",
     )
+    pipe.enable_model_cpu_offload()
     yield
     del pipe
 
