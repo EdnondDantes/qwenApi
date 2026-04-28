@@ -27,11 +27,17 @@ def check_token(creds: HTTPAuthorizationCredentials = Depends(auth_scheme)):
 async def lifespan(app: FastAPI):
     global pipe
     from diffusers import QwenImageEditPlusPipeline
+    from torchao.quantization import int8_weight_only, quantize_
 
     pipe = QwenImageEditPlusPipeline.from_pretrained(
         MODEL_PATH,
         torch_dtype=torch.bfloat16,
-    ).to("cuda")
+    )
+
+    quantize_(pipe.text_encoder, int8_weight_only())
+    quantize_(pipe.transformer, int8_weight_only())
+
+    pipe.to("cuda")
     yield
     del pipe
 
